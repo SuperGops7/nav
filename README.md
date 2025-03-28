@@ -1,3 +1,5 @@
+# nav
+
 trajectory_capture:
     two nodes
         one to capture the data from amr and store - will be run upon service call

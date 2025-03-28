@@ -1,5 +1,5 @@
 string filename
-float64 duration
+float32 duration
 ---
 bool success
 string message
