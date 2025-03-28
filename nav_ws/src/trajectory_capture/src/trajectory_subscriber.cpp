@@ -62,8 +62,9 @@ class OdomSubscriber : public rclcpp::Node
     std::shared_ptr<turtlebot_interfaces::srv::TrajectoryRequest_Response> response)
 {
     std::string filename = request->filename;
+    double duration = request->duration;
     RCLCPP_INFO(this->get_logger(), "Saving trajectory with %s", request->filename.c_str());
-    RCLCPP_INFO(this->get_logger(), "Saving trajectory with %f", request->duration);
+    RCLCPP_INFO(this->get_logger(), "Saving trajectory with %f", duration);
 
     std::string dir = "src/trajectory_capture/logs/";
     std::string full_path = dir + request->filename;
