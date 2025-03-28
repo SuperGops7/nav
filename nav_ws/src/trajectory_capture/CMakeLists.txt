@@ -7,6 +7,40 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(turtlebot_interfaces REQUIRED)
+
+set(dependencies
+  rclcpp
+  std_msgs
+  nav_msgs
+  turtlebot_interfaces
+)
+
+include_directories(
+  include
+)
+
+add_executable(trajectory_capture src/trajectory_subscriber.cpp)
+ament_target_dependencies(trajectory_capture ${dependencies})
+
+add_executable(trajectory_capture_server src/trajectory_capture_server.cpp)
+ament_target_dependencies(trajectory_capture_server rclcpp turtlebot_interfaces)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+# Install cpp executables
+install(
+  TARGETS
+  trajectory_capture
+  trajectory_capture_server
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 
 if(BUILD_TESTING)
@@ -20,5 +54,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()
