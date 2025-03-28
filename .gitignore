@@ -2,3 +2,5 @@
 nav_ws/build/
 nav_ws/install/
 nav_ws/log/
+
+.vscode
