@@ -24,7 +24,7 @@ include_directories(
 )
 
 add_executable(trajectory_capture src/trajectory_subscriber.cpp)
-ament_target_dependencies(trajectory_capture ${dependencies})
+ament_target_dependencies(trajectory_capture turtlebot_interfaces ${dependencies})
 
 add_executable(trajectory_capture_server src/trajectory_capture_server.cpp)
 ament_target_dependencies(trajectory_capture_server rclcpp turtlebot_interfaces)
