@@ -13,27 +13,29 @@
 
 class TrajPublisher : public rclcpp::Node
 {
-    public:
-        TrajPublisher()
+public:
+    TrajPublisher()
         : Node("trajectory_publisher"), filename_("test.csv")
-        {
-            publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("/trajectory_points_array", 10);
+    {
+        publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("/trajectory_points_array", 10);
 
-            std::string dir = "src/trajectory_capture/logs/";
-            std::string full_path = dir + filename_;
-            read_and_store_trajectory(full_path.c_str());
+        std::string dir = "src/trajectory_capture/logs/";
+        std::string full_path = dir + filename_;
+        read_and_store_trajectory(full_path.c_str());
 
-            timer_ = this->create_wall_timer(
+        timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
             std::bind(&TrajPublisher::publish_trajectory, this));
 
-            RCLCPP_INFO(this->get_logger(), "Trajectory Publisher Started");
-        }
+        RCLCPP_INFO(this->get_logger(), "Trajectory Publisher Started");
+    }
 
-    private:
-        void read_and_store_trajectory(const std::string& filename) {
+private:
+    void read_and_store_trajectory(const std::string &filename)
+    {
         std::ifstream file(filename);
-        if (!file.is_open()) {
+        if (!file.is_open())
+        {
             RCLCPP_ERROR(this->get_logger(), "Failed to open file: %s", filename.c_str());
             return;
         }
@@ -42,8 +44,10 @@ class TrajPublisher : public rclcpp::Node
         std::string line;
         int id = 0;
 
-        while (std::getline(file, line)) {
-            if (line == "sec,nsec,x,y,z"){
+        while (std::getline(file, line))
+        {
+            if (line == "sec,nsec,x,y,z")
+            {
                 continue;
             }
             std::istringstream ss(line);
@@ -51,7 +55,8 @@ class TrajPublisher : public rclcpp::Node
             uint32_t nsec;
             double x, y, z;
             char comma;
-            if (!(ss >> sec >> comma >> nsec >> comma >> x >> comma >> y >> comma >> z)) {
+            if (!(ss >> sec >> comma >> nsec >> comma >> x >> comma >> y >> comma >> z))
+            {
                 RCLCPP_ERROR(this->get_logger(), "Invalid CSV format for: %s", line.c_str());
                 continue;
             }
@@ -78,24 +83,23 @@ class TrajPublisher : public rclcpp::Node
         stored_trajectory_ = vector_marker;
         file.close();
     }
-        void publish_trajectory() {
+    void publish_trajectory()
+    {
         // Publish stored trajectory periodically
         RCLCPP_INFO(this->get_logger(), "Trajectory Publishing");
         publisher_->publish(stored_trajectory_);
     }
 
-
-        rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher_;
-        rclcpp::TimerBase::SharedPtr timer_;
-        visualization_msgs::msg::MarkerArray stored_trajectory_;
-        std::string filename_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+    visualization_msgs::msg::MarkerArray stored_trajectory_;
+    std::string filename_;
 };
 
-
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
-  rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<TrajPublisher>());
-  rclcpp::shutdown();
-  return 0;
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<TrajPublisher>());
+    rclcpp::shutdown();
+    return 0;
 }
