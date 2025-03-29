@@ -11,6 +11,7 @@ find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(turtlebot_interfaces REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 set(dependencies
   rclcpp
@@ -29,16 +30,25 @@ ament_target_dependencies(trajectory_capture turtlebot_interfaces ${dependencies
 add_executable(trajectory_capture_server src/trajectory_capture_server.cpp)
 ament_target_dependencies(trajectory_capture_server rclcpp turtlebot_interfaces)
 
+add_executable(trajectory_publisher src/trajectory_publisher.cpp)
+ament_target_dependencies(trajectory_publisher turtlebot_interfaces visualization_msgs ${dependencies})
+
 install(
   DIRECTORY include/
   DESTINATION include
 )
+
+install(DIRECTORY
+    rviz
+    launch
+    DESTINATION share/${PROJECT_NAME})
 
 # Install cpp executables
 install(
   TARGETS
   trajectory_capture
   trajectory_capture_server
+  trajectory_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
 

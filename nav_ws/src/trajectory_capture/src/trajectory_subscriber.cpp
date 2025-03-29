@@ -56,6 +56,34 @@ class OdomSubscriber : public rclcpp::Node
           trajectory_.push_back(trajectory_point);
     }
 
+    void pruneOldTrajectoryPoints(std::vector<TrajectoryStruct>& trajectory, double duration) {
+  if (trajectory.empty()) {
+    return;
+  }
+
+  // Compute the time (in seconds) of the latest (most recent) entry.
+  double latest_time = trajectory.back().sec + trajectory.back().nsec * 1e-9;
+
+  // Get the time of the oldest entry.
+  double first_time = trajectory.front().sec + trajectory.front().nsec * 1e-9;
+
+  // If the oldest entry is less than 40 seconds older than the latest, then no pruning is needed.
+  if (latest_time - first_time <= duration) {
+    return;
+  }
+
+  // Remove all entries older than 40 seconds relative to the latest time.
+  trajectory.erase(
+    std::remove_if(trajectory.begin(), trajectory.end(),
+      [latest_time, duration](const TrajectoryStruct& point) {
+        double point_time = point.sec + point.nsec * 1e-9;
+        return (latest_time - point_time > duration);
+      }
+    ),
+    trajectory.end()
+  );
+}
+
 
     void trajectory_capture_callback(
     const std::shared_ptr<turtlebot_interfaces::srv::TrajectoryRequest_Request> request,
@@ -65,6 +93,8 @@ class OdomSubscriber : public rclcpp::Node
     double duration = request->duration;
     RCLCPP_INFO(this->get_logger(), "Saving trajectory with %s", request->filename.c_str());
     RCLCPP_INFO(this->get_logger(), "Saving trajectory with %f", duration);
+
+    pruneOldTrajectoryPoints(trajectory_, duration);
 
     std::string dir = "src/trajectory_capture/logs/";
     std::string full_path = dir + request->filename;
@@ -120,6 +150,7 @@ class OdomSubscriber : public rclcpp::Node
     rclcpp::Service<turtlebot_interfaces::srv::TrajectoryRequest>::SharedPtr trajectory_capture_service_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
     std::vector<TrajectoryStruct> trajectory_;
+    std::vector<TrajectoryStruct> updated_trajectory_;
     std::ofstream file_;
 };
 
