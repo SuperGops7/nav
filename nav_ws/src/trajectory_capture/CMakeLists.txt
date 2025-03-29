@@ -27,9 +27,6 @@ include_directories(
 add_executable(trajectory_capture src/trajectory_subscriber.cpp)
 ament_target_dependencies(trajectory_capture turtlebot_interfaces ${dependencies})
 
-add_executable(trajectory_capture_server src/trajectory_capture_server.cpp)
-ament_target_dependencies(trajectory_capture_server rclcpp turtlebot_interfaces)
-
 add_executable(trajectory_publisher src/trajectory_publisher.cpp)
 ament_target_dependencies(trajectory_publisher turtlebot_interfaces visualization_msgs ${dependencies})
 
@@ -47,7 +44,6 @@ install(DIRECTORY
 install(
   TARGETS
   trajectory_capture
-  trajectory_capture_server
   trajectory_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
