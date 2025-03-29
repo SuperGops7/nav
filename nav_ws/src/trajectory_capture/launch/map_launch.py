@@ -18,9 +18,9 @@ def generate_launch_description():
     )
 
     # Map server
-    map_server_config_path = os.path.join(
+    map_file_path = os.path.join(
         get_package_share_directory('trajectory_capture'),
-        'launch',
+        'maps',
         'map.yaml'
     )
     rviz_start = Node(
@@ -31,12 +31,22 @@ def generate_launch_description():
             arguments=["-d", rviz_config_path],
             parameters=[{"use_sim_time": True}]
         )
+    lifecycle_nodes = ['map_server']
+    use_sim_time = True
+    autostart = True
 
     map_server_cmd = Node(
         package='nav2_map_server',
         executable='map_server',
+        name='map_server',
         output='screen',
-        parameters=[{'yaml_filename': map_server_config_path}])
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'yaml_filename': map_file_path,
+            'topic_name': 'map',
+            'frame_id': 'map'
+        }]
+    )
 
     tf_transform_node = Node(
         package='tf2_ros',
@@ -44,11 +54,6 @@ def generate_launch_description():
         arguments = ['1.951', '0.535', '-0.015', '0.071', '0.000', '-0.007', 'map', 'odom'],
         output='screen'
     )
-
-
-    lifecycle_nodes = ['map_server']
-    use_sim_time = True
-    autostart = True
 
     start_lifecycle_manager_cmd = launch_ros.actions.Node(
             package='nav2_lifecycle_manager',

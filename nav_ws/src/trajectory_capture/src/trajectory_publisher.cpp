@@ -15,12 +15,12 @@ class TrajPublisher : public rclcpp::Node
 {
     public:
         TrajPublisher()
-        : Node("trajectory_publisher")
+        : Node("trajectory_publisher"), filename_("test.csv")
         {
             publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("/trajectory_points_array", 10);
 
             std::string dir = "src/trajectory_capture/logs/";
-            std::string full_path = dir + "test.csv";
+            std::string full_path = dir + filename_;
             read_and_store_trajectory(full_path.c_str());
 
             timer_ = this->create_wall_timer(
@@ -88,6 +88,7 @@ class TrajPublisher : public rclcpp::Node
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher_;
         rclcpp::TimerBase::SharedPtr timer_;
         visualization_msgs::msg::MarkerArray stored_trajectory_;
+        std::string filename_;
 };
 
 
